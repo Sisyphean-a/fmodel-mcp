@@ -2,7 +2,7 @@
 
 > [架构入口](architecture.md) · [工具契约](tool-contracts.md) · [解析与索引](parser-and-indexes.md)
 > 读者结果：接手开发者能逐阶段完成可验证实现，而不是根据目录图一次生成一堆无法运行的代码。
-> 状态：本轮只完成设计与静态/文档验证。以下产品测试均是后续开发要求，不是本轮已经通过的测试。
+> 状态：实现已落地并完成当前工作树的锁定 restore、Release 构建、自动化测试、win-x64 发布、官方 MCP 子进程验证和真实 Black Myth: Wukong 探针。验收矩阵仍是持续回归清单；未通过或环境不可得的能力必须按第 11 节明确列出。
 
 ## 1. 接手任务书
 
@@ -264,7 +264,7 @@ console.log(JSON.stringify({ root, files: files.length, sha256: hash(Buffer.from
 
 ## 10. 最终发布接口与验证命令
 
-以下命令是**将来项目建好后的验收命令**，当前不可运行。开发者若改变项目路径，必须同步此处，不保留失效示例。
+以下命令是当前项目的锁定验收命令。开发者若改变项目路径，必须同步此处，不保留失效示例。
 
 ```powershell
 dotnet --info
@@ -303,16 +303,16 @@ dotnet publish src/FModelMcp/FModelMcp.csproj -c Release -r win-x64 --self-conta
 5. 本地配置与启动说明，密钥不进入 Git/日志，游戏目录写入测试为零。
 6. 已知限制和成本数据；特别说明 Native/运行时 Hook、IoStore、CDO 默认值和包级引用图的边界。
 
-## 12. 设计交付的核验范围
+## 12. 当前实现核验范围
 
-本轮已执行的设计核验：
+当前工作树已完成以下可复核证据：
 
-- 四份文件的内部链接与代码围栏完整性检查；4 个 JSON 代码块、24 个工具调用示例通过 JSON 语法解析。
-- 工具标题共 24 个且无重复；源码锚点表中 29 条 C# 文件路径均存在。
-- 直接运行本文快照算法，两份本地源码的文件数/SHA256 与第 2 节一致；net10.0 目标复核一致。
-- Python sqlite3 / SQLite 3.49.1 的内存数据库执行当前 DDL 成功；文本与 FTS 事务回滚、head 切换、旧快照清理、外键一致性 smoke test 通过。
-- 同一 SQLite 环境中，11 个中文长/短词、英文、全角、引号、标点及 emoji 子串案例通过。这里只验证所列样例与 SQL 算法，不代表 .NET 规范化、Microsoft.Data.Sqlite 打包能力或 Windows WAL 行为已经验证。
+- `global.json` 固定 .NET SDK 10.0.400；应用、测试和本地 CUE4Parse 依赖启用 lock file，locked restore 成功。
+- Release 构建无警告/错误；官方 ModelContextProtocol `StdioClientTransport` 子进程测试通过，`tools/list` 暴露 24 个工具，schema 闭合，`get_status` 和 `list_archives` 可调用。
+- 自动化测试全量通过（12 个，无失败/跳过），包含 structuredContent/TextContent 一致性、失败包络、FTS5 trigram、规范化 SQLite v1 schema、快照/任务恢复、配置路径和 patch 校验，以及第二会话 `CACHE_LOCKED`。
+- framework-dependent `win-x64` 发布成功，发布目录包含 `FModelMcp.exe` 和 `CUE4Parse-Natives.dll`；工具绑定使用单一 Host runtime，不创建重复 DI 容器。
+- 使用被忽略的 `.tmp/real-key.json` 和游戏目录下的 `b1/Binaries/Win64/Mappings.usmap` 完成真实探针：22 个 pak 全部挂载，502,986 个物理条目、438,669 个有效文件、161,027 个包、16,025 个冲突；DataTable 5 行、UCurveFloat 2 个曲线键、UClass 7 个 CDO/reflection 属性、UFunction 3 个完整 Kismet 表达式、zh-Hans locres 与中文 `显卡` 搜索均有结果。
+- 真实 asset/text/reference 索引分别完成 19/19、14/14、19/19 和 18/18 单元；引用边人工核对了 `ABP_rebirthpoint → SK_empty` 的 resolved packageImport。`显卡` 中文检索返回 locres 的 namespace/key/text/identityLinks；探针同时确认该样本没有可验证的业务 ID 把该 locres key 直接关联到 DataTable 行，因此不臆造关联，证据缺口被保留。raw/JSON 导出均完成，manifest 的 exportId 目录、字节数、SHA-256 和 sourceArchiveId 已由文件重算核对；`../outside` 明确返回 `PATH_NOT_ALLOWED`。
+- Worker 畸形 JSON 探针返回 `INVALID_ARGUMENT`，stdout 没有日志污染；游戏目录未写入测试产物，真实 key、缓存、发布物和导出物均位于 `.tmp/` 忽略目录。
 
-这些结果不替代未来 P0–P5 的构建、协议和真实游戏测试。本轮没有安装 SDK、创建业务项目、挂载游戏或运行上游补丁。
-
-尚未解决但不阻止交接的事实问题：上游提交身份、具体 Native DLL 来源/版本、当前游戏 AES/usmap 的适用性、真实资产路径和各功能可读率。实施顺序把这些前置到 P0，而不是留给最后验收时猜测。
+仍需明确保留的环境限制：当前机器没有可用于构建/验证 CUE4Parse-Natives Oodle feature 的 Oodle SDK/core 源码；即使显式指定本地 Oodle runtime DLL，发布程序仍正确报告 `NATIVE_DEPENDENCY_MISSING`、`mountState=partial`，不能把 sidecar 或独立 runtime DLL 存在当作 Oodle 已验证。v1 仍只支持 pak，IoStore 只报告 unsupported。T01–T32 中未被上述自动化或真实探针覆盖的故障注入/极限预算场景仍应在后续回归中逐项补充，不能用本节证据替代。

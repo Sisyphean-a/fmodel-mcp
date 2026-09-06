@@ -1,15 +1,15 @@
 ---
 scope: workspace
-status: design-baseline
+status: implemented
 ---
 
 # 架构索引
 
-本仓库是一个尚未实施的 FModel MCP 设计基线：业务/构建内容只有 `docs/`、空的 `package.json` 和无依赖的 `package-lock.json`；`.codestable/` 是本次初始化的项目记忆，除此之外没有源码、测试项目或可运行入口。新工作先从本索引进入，再按包范围加载；不要把设计中的目标路径或验收命令当成现有代码。
+本仓库已实现 FModel MCP 的唯一产品包；`docs/` 是需求与验收权威，`.codestable/` 只保存当前态入口。新工作先从本索引进入，再按包范围加载；代码、测试、发布和真实内容证据仍需按对应验收范围单独核对。
 
 ## 作用域地图
 
-- [package:fmodel-mcp](packages/fmodel-mcp.md)：唯一可识别的产品实现范围；当前尚无实现，职责和目标边界来自现有设计文档。
+- [package:fmodel-mcp](packages/fmodel-mcp.md)：唯一产品实现范围；当前实现、职责和目标边界由代码与现有设计文档共同约束。
 - `shared/`：当前没有多个实现包或跨包共享机制的证据，不创建共享架构事实。
 - [workspace 领域上下文](../requirements/CONTEXT.md)：工作区唯一已确认的业务语言、稳定规则和不变量。
 

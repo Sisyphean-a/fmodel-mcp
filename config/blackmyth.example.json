@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "gameRoot": "D:\\SteamLibrary\\steamapps\\common\\BlackMythWukong",
+  "ueVersion": "GAME_BlackMythWukong",
+  "aesKey": null,
+  "usmap": "D:\\SteamLibrary\\steamapps\\common\\BlackMythWukong\\b1\\Binaries\\Win64\\Mappings.usmap",
+  "language": "zh-Hans",
+  "archiveDir": "b1/Content/Paks",
+  "outputRoot": "E:\\mod\\fmodel-mcp-output",
+  "cacheRoot": "E:\\mod\\fmodel-mcp-cache",
+  "nativeLibraries": {
+    "oodlePath": null
+  }
+}

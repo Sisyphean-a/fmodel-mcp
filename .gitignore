@@ -1,0 +1,16 @@
+# Build and local verification output
+bin/
+obj/
+.tmp/
+*.local.json
+
+# Local game configuration and secrets
+config/*.local.json
+config/*.local.*.json
+
+# Generated codegraph index
+.codegraph/
+
+# IDE/user state
+.vs/
+.idea/
