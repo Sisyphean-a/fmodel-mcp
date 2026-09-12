@@ -32,6 +32,26 @@ public sealed class ContractTests
     }
 
     [Fact]
+    public void ToolResults_replace_oversized_success_with_bounded_failure_envelope()
+    {
+        var result = ToolResults.Success("session-1", new { value = new string('x', 4_000) }, maxResultBytes: 4_096);
+
+        Assert.True(result.IsError);
+        var structured = result.StructuredContent!.Value;
+        Assert.Equal("OUTPUT_BUDGET_EXCEEDED", structured.GetProperty("error").GetProperty("code").GetString());
+        var text = Assert.IsType<TextContentBlock>(Assert.Single(result.Content)).Text;
+        Assert.Equal(structured.GetRawText(), text);
+        Assert.InRange(System.Text.Encoding.UTF8.GetByteCount(text), 1, 4_096);
+    }
+
+    [Fact]
+    public void Config_patch_rejects_fractional_integer_limit()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ConfigPatch>(
+            "{\"limits\":{\"maxPageSize\":1.5}}", JsonDefaults.Options));
+    }
+
+    [Fact]
     public void Sqlite_supports_required_fts5_trigram_tokenizer()
     {
         using var temp = new TempDirectory();

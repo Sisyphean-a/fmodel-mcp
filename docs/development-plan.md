@@ -309,9 +309,9 @@ dotnet publish src/FModelMcp/FModelMcp.csproj -c Release -r win-x64 --self-conta
 
 - `global.json` 固定 .NET SDK 10.0.400；应用、测试和本地 CUE4Parse 依赖启用 lock file，locked restore 成功。
 - Release 构建无警告/错误；官方 ModelContextProtocol `StdioClientTransport` 子进程测试通过，`tools/list` 暴露 24 个工具，schema 闭合，`get_status` 和 `list_archives` 可调用。
-- 自动化测试全量通过（12 个，无失败/跳过），包含 structuredContent/TextContent 一致性、失败包络、FTS5 trigram、规范化 SQLite v1 schema、快照/任务恢复、配置路径和 patch 校验，以及第二会话 `CACHE_LOCKED`。
+- 自动化测试全量通过（14 个，无失败/跳过），包含 structuredContent/TextContent 一致性、失败包络、结果预算、严格数字校验、FTS5 trigram、规范化 SQLite v1 schema、快照/任务恢复、配置路径和 patch 校验、ToolEnvelope outputSchema、真实游标失配/非法游标、异步导出路径拒绝，以及第二会话 `CACHE_LOCKED`。
 - framework-dependent `win-x64` 发布成功，发布目录包含 `FModelMcp.exe` 和 `CUE4Parse-Natives.dll`；工具绑定使用单一 Host runtime，不创建重复 DI 容器。
-- 使用被忽略的 `.tmp/real-key.json` 和游戏目录下的 `b1/Binaries/Win64/Mappings.usmap` 完成真实探针：22 个 pak 全部挂载，502,986 个物理条目、438,669 个有效文件、161,027 个包、16,025 个冲突；DataTable 5 行、UCurveFloat 2 个曲线键、UClass 7 个 CDO/reflection 属性、UFunction 3 个完整 Kismet 表达式、zh-Hans locres 与中文 `显卡` 搜索均有结果。
+- 在此前被忽略的 `.tmp/real-key.json` 与游戏目录 `b1/Binaries/Win64/Mappings.usmap` 的完整真实样本运行中，22 个 pak 全部挂载，得到 502,986 个物理条目、438,669 个有效文件、161,027 个包、16,025 个冲突；DataTable 5 行、UCurveFloat 2 个曲线键、UClass 7 个 CDO/reflection 属性、UFunction 3 个完整 Kismet 表达式、zh-Hans locres 与中文 `显卡` 搜索均有结果。当前本地游戏目录本轮复查仅剩 1 个 pak，因此本轮新增协议测试改为动态发现 `uasset`，不把历史 22-pak 数字冒充为本轮新鲜探针结果。
 - 真实 asset/text/reference 索引分别完成 19/19、14/14、19/19 和 18/18 单元；引用边人工核对了 `ABP_rebirthpoint → SK_empty` 的 resolved packageImport。`显卡` 中文检索返回 locres 的 namespace/key/text/identityLinks；探针同时确认该样本没有可验证的业务 ID 把该 locres key 直接关联到 DataTable 行，因此不臆造关联，证据缺口被保留。raw/JSON 导出均完成，manifest 的 exportId 目录、字节数、SHA-256 和 sourceArchiveId 已由文件重算核对；`../outside` 明确返回 `PATH_NOT_ALLOWED`。
 - Worker 畸形 JSON 探针返回 `INVALID_ARGUMENT`，stdout 没有日志污染；游戏目录未写入测试产物，真实 key、缓存、发布物和导出物均位于 `.tmp/` 忽略目录。
 
